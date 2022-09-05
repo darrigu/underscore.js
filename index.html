@@ -23,28 +23,25 @@
       )
     }
 
-    window.onload = () => {
-      const _app =
-        _router({
-          '/':
-            _div(
-              _navbar(),
-              _h2("A functional JavaScript front-end framework"),
-            ),
-          '/about':
-            _div(
-              _navbar(),
-              _h2("About Underscore.js..."),
-            ),
-          '/404':
-            _div(
-              _h1("404 Page Not Found"),
-              _a('Return to Home')._att({href: '#'})
-            )
-        })
-
-      entry.appendChild(_app)
-    }
+    entry.appendChild(
+      _router({
+        '/':
+          _div(
+            _navbar(),
+            _h2("A functional JavaScript front-end framework"),
+          ),
+        '/about':
+          _div(
+            _navbar(),
+            _h2("About Underscore.js..."),
+          ),
+        '/404':
+          _div(
+            _h1("404 Page Not Found"),
+            _a('Return to Home')._att({href: '#'})
+          )
+      })
+    )
   </script>
 </body>
 
