@@ -1,11 +1,16 @@
 function _(name, ...children) {
   const result = document.createElement(name)
 
-  for (const child of children)
-    result.appendChild(child)
+  for (const child of children) {
+    if (typeof (child) === 'string')
+      result.appendChild(document.createTextNode(child))
+    else
+      result.appendChild(child)
+  }
 
-  result._att = function(name, value) {
-    this.setAttribute(name, value)
+  result._att = function(atts) {
+    for (const [name, value] of Object.entries(atts))
+      this.setAttribute(name, value)
     return this
   }
 
@@ -17,91 +22,43 @@ function _(name, ...children) {
   return result
 }
 
-function _text(s) {
-  return document.createTextNode(s)
-}
-
-function _h1(...children) {
-  return _('h1', ...children)
-}
-
-function _h2(...children) {
-  return _('h2', ...children)
-}
-
-function _h3(...children) {
-  return _('h3', ...children)
-}
-
-function _p(...children) {
-  return _('p', ...children)
-}
-
-function _a(...children) {
-  return _('a', ...children)
-}
-
-function _div(...children) {
-  return _('div', ...children)
-}
+const MUNDANE_TAGS = ['canvas', 'h1', 'h2', 'h3', 'p', 'a', 'div', 'span', 'nav', 'ul', 'li', 'strong']
+for (let tagName of MUNDANE_TAGS)
+  window['_' + tagName] = (...children) => _(tagName, ...children)
 
 function _img(src) {
-  return _('img')._att("src", src)
+  return _('src')._att({ src })
 }
 
-function _nav(...children) {
-  return _('nav', ...children);
+function _input(type) {
+  return _('input')._att({ type });
 }
 
-function _ul(...children) {
-  return _('ul', ...children);
-}
+function _router(routes) {
+  let _result = _div()
 
-function _li(...children) {
-  return _('li', ...children);
-}
+  function syncHash() {
+    let hashLocation = document.location.hash.split('#')[1]
+    if (!hashLocation)
+      hashLocation = '/'
 
-function _tab_switcher(names, choose) {
-  return _nav(
-    _ul(
-      ...names.map((name, index) => {
-        return _li(
-          _a(_text(name))
-            ._att('href', '#')
-            ._onclick(() => choose(index))
-        )._att('class', 'tab')
-      })
-    )
-  )
-}
+    if (!(hashLocation in routes)) {
+      const route404 = '/404'
+      console.assert(route404 in routes)
+      hashLocation = route404
+    }
 
-function _tabs(ts) {
-  const names = Object.keys(ts)
-  const tags = names.map(name => ts[name])
+    while (_result.firstChild)
+      _result.removeChild(_result.lastChild)
 
-  console.assert(tags.length > 0)
+    _result.appendChild(routes[hashLocation])
 
-  let currentTab = 0;
-  const _tab_slot = _div(tags[currentTab])
+    return _result;
+  }
 
-  return _div(
-    _tab_switcher(Object.keys(ts), index => {
-      _tab_slot.removeChild(tags[currentTab])
-      _tab_slot.appendChild(tags[index])
-      currentTab = index
-    })._att('class', 'tab-switcher'),
-    _tab_slot
-  )
-}
+  syncHash()
 
-window.onload = () => {
-  entry.appendChild(
-    _div(
-      _h1(_text("Underscore.js")),
-      _h2(_text("A functional javascript front-end framework")),
-      _tabs({
-        hello: _h3(_text("Hello!")),
-        bye: _h3(_text("Bye!")),
-      }),
-    )._att('class', 'container'))
+  window.addEventListener("hashchange", syncHash);
+
+  return _result
 }

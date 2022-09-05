@@ -8,8 +8,44 @@
 </head>
 
 <body>
-  <div id="entry"></div>
+  <div id="entry" class="container"></div>
   <script src="underscore.js"></script>
+  <script>
+    function _navbar() {
+      return _nav(
+        _ul(
+          _li(_strong('Underscore.js'))
+        ),
+        _ul(
+          _li(_a('Home')._att({href: '#'})),
+          _li(_a('About')._att({href: '#/about'})),
+        )
+      )
+    }
+
+    window.onload = () => {
+      const _app =
+        _router({
+          '/':
+            _div(
+              _navbar(),
+              _h2("A functional JavaScript front-end framework"),
+            ),
+          '/about':
+            _div(
+              _navbar(),
+              _h2("About Underscore.js..."),
+            ),
+          '/404':
+            _div(
+              _h1("404 Page Not Found"),
+              _a('Return to Home')._att({href: '#'})
+            )
+        })
+
+      entry.appendChild(_app)
+    }
+  </script>
 </body>
 
 </html>
